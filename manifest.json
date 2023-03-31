@@ -1,0 +1,30 @@
+{
+    "manifest_version": 2,
+    "name": "My Chrome Extension",
+    "version": "1.0",
+    "description": "A chrome extension that generates a summary of Gong.io call transcripts",
+    "icons": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    },
+    "browser_action": {
+      "default_icon": "icon128.png",
+      "default_popup": "popup.html"
+    },
+    "permissions": [
+      "tabs",
+      "https://amplitude.app.gong.io/*"
+    ],
+    "web_accessible_resources": [
+        "content_script.js"
+      ],      
+    "content_scripts": [
+        {
+          "matches": ["http://*/*",
+                    "https://*/*"],
+          "js": ["content.js"]
+        }
+      ]
+  }
+  

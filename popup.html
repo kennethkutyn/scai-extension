@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Chrome Extension</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 14px;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 150px;
+        width: 300px;
+      }
+      .input {
+        margin-bottom: 10px;
+        width: 100%;
+      }
+      .button {
+        background-color: blue;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .loading {
+        display: none;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <input type="text" placeholder="Your Name" class="input">
+      <button class="button" id="generate-summary-button">Generate Summary</button>
+      <img src="loading.gif" class="loading">
+    </div>
+    <div id="loading">
+        <div class="lds-ripple">
+          <div></div>
+          <div></div>
+        </div>
+        <div class="loading-text">Loading...</div>
+      </div>
+      <div id="message">Done. Your summary is copied to your clipboard.</div>
+    <script src="popup.js"></script>
+  </body>
+</html>
