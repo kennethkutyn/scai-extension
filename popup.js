@@ -86,8 +86,7 @@ function generateSummary() {
           model: "text-davinci-003",
           prompt: prompt,
           max_tokens: 1000,
-          temperature: 0.7,
-          context: `Session ID: ${sessionId}` 
+          temperature: 0.7
         }),
       })
         .then(function (response) {
