@@ -84,6 +84,7 @@ function generateSummary() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "type": "AI"
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
