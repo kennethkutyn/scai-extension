@@ -70,7 +70,7 @@ function generateSummary() {
       numChunks = transcriptChunks.length;
       console.log('setting numChunks to ' + numChunks);
       for (let i = 0; i < transcriptChunks.length; i++) {
-        var loopPrompt = "Summarize this conversation in a paragraph. Note any specific and action items in bullet points with the name of the relevant person, following the summary paragraph: "
+        var loopPrompt = "Summarize this sales conversation in a paragraph. Mention any specific amplitude features that were discussed and whether the prospect seemed interested in them. Mention any 3rd party technologies that the prospect is using already or considering using. Mention any questions the prospect asked that the Amplitude attendees were unable to answer and said they would follow up, including which person asked the question. Note any specific action items in bullet points with the name of the relevant person, following the summary paragraph: "
         console.log("now in loop #" + i);
         console.log(transcriptChunks.length);
         makeCall(loopPrompt, transcriptChunks[i]);
@@ -144,7 +144,7 @@ function generateSummary() {
     if(numResponses == numChunks){
         console.log('responses lequal chunks, sending final request');
 
-        var finalPrompt = "I used Chat GPT to summarize a long meeting transcript. Because the transcript was long, I had to do it in several parts. Summarize the following summary paragraphs into 2-3 paragraphs, treating each as a summary of just a part of a single longer meeting. If the input includes any 'Action Items' bullet point, repeat these in your response without modification and place them below the summary paragraphs.";
+        var finalPrompt = "The following are several summaries from a single sales conversation between Amplitude and a prospective customer. First, list all action items in bullet points. Then, summarize the paragraphs into 1 paragraph about what Amplitude features were discussed, 1 paragraph about the customers business needs and requirements and 1 paragraph about next steps."
 
         console.log('making final call with prompt: \n ' + finalPrompt + ' and subprompt '+ finalSubPrompt + ' prompt finished');
         makeCall(finalPrompt, finalSubPrompt);
@@ -154,9 +154,9 @@ function generateSummary() {
 
   function copyText(data){
     var responseTextField = document.getElementById('response-text');
-    responseTextField.innerText = data;
+    var myLineBreak = data.replace(/\r\n|\r|\n/g,"</br>");
+    responseTextField.innerText = myLineBreak;
     responseTextField.select();
     responseTextField.setSelectionRange(0, 99999);
     document.execCommand("copy");
-    console.log('copying');
   }
