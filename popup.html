@@ -31,22 +31,30 @@
         display: none;
         margin-bottom: 10px;
       }
+      .response-text {
+        position: "absolute";
+        left: -9999px;
+        width: 100%;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <input type="text" placeholder="Your Name" class="input">
+      <input type="text" placeholder="Your Name" style="display:none" class="input" >
       <button class="button" id="generate-summary-button">Generate Summary</button>
-      <img src="loading.gif" class="loading">
+      <button class="button" id="copy-button" style="display:none">Copy Output</button>
+      <img id="loading-image" style="width:220px" style="padding-top: 10px;" src="monkey-typing.gif" class="loading">
+      <textarea class="reponse-text" id="response-text" style="display:none"></textarea>
+
     </div>
     <div id="loading">
         <div class="lds-ripple">
           <div></div>
           <div></div>
         </div>
-        <div class="loading-text">Loading...</div>
+        <div class="loading-text" id="loading-text" style="display:none">Loading. This will take about 30 seconds.</div>
       </div>
-      <div id="message">Done. Your summary is copied to your clipboard.</div>
+      <div id="success-message" style="display:none">Done.</div>
     <script src="popup.js"></script>
   </body>
 </html>
