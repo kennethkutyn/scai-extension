@@ -7,6 +7,8 @@ var finalPrompt = "";
 var finalSubPrompt = "";
 var numResponses = 0;
 var numChunks = 0;
+var finalActionsString = "";
+var finalSummaryString = "";
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -70,16 +72,18 @@ function generateSummary() {
       numChunks = transcriptChunks.length;
       console.log('setting numChunks to ' + numChunks);
       for (let i = 0; i < transcriptChunks.length; i++) {
-        var loopPrompt = "Summarize this sales conversation in a paragraph. Mention any specific amplitude features that were discussed and whether the prospect seemed interested in them. Mention any 3rd party technologies that the prospect is using already or considering using. Mention any questions the prospect asked that the Amplitude attendees were unable to answer and said they would follow up, including which person asked the question. Note any specific action items in bullet points with the name of the relevant person, following the summary paragraph: "
+        var summaryPrompt = "Summarize this sales conversation between Amplitude and a prospective customer in a paragraph. Mention any specific amplitude features that were discussed. Mention the prospect's business requirements that were discuss and any timeline for meeting those requirements, if any. Mention any 3rd party technologies that the prospect is using already or considering using, if any. Avoid any introductory text such as 'this is a sales conversation between amplitude and a prospect'";
+        var actionsPrompt = "Extract any action items from this sales conversation between Amplitude and a prospective customer and restate them in bullet points. Do not include any additional text before or or after the bullet points."
         console.log("now in loop #" + i);
         console.log(transcriptChunks.length);
-        makeCall(loopPrompt, transcriptChunks[i]);
+        makeCall(summaryPrompt, transcriptChunks[i], "summary");
+        //makeCall(actionsPrompt, transcriptChunks[i], "actions");
       }
 
   }
 
-  function makeCall(loopPrompt, subprompt){
-    var combinedPrompt = loopPrompt + subprompt;
+  function makeCall(contextPrompt, transcriptChunk, type){
+    var combinedPrompt = contextPrompt + transcriptChunk;
     fetch("https://scai.herokuapp.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -96,7 +100,7 @@ function generateSummary() {
         }),
       })
       .then(response => response.json())
-        .then(data => responseReady(data.choices[0].message.content));
+        .then(data => responseReady(data.choices[0].message.content, type));
 
 
           // Remove loading animation
@@ -121,43 +125,83 @@ function generateSummary() {
   }
   
 
-  function responseReady(data){
+  function responseReady(data, type){
     numResponses = numResponses + 1.0;
-    console.log("responses: " + numResponses + " and numChunks: " + numChunks);
+    console.log("responses: " + numResponses + " and numChunks: " + numChunks);    
+    /*if (type == "actions"){
+      finalActionsString = finalActionsString + data;
+      console.log('finalActions String: ' + finalActionsString);
+    }*/
+
+    /*if (type == "summary"){
+      finalSummaryString = finalSummaryString + data + '\n\n';
+    }*/
 
     if(numResponses < numChunks){
-        finalSubPrompt = finalSubPrompt + data;
-        console.log('responses less than chunks, updating final subprompt');
+        finalSummaryString = finalSummaryString + data;
+        console.log('responses less than chunks, updating final summary string');
     }
+
     if(numResponses == numChunks + 1){
-        console.log('responses equal chunks + 1, writing data to console');
-        console.log(data);
+        //console.log('Actions: ' + finalActionsString);
+        //console.log('Summary: ' + finalSummaryString);
         document.getElementById("success-message").style.display = "block";
-        document.getElementById("response-text").style.display = "block";
+        document.getElementById("summary-text").style.display = "block";
+        //document.getElementById("action-text").style.display = "block";
         document.getElementById("loading-text").style.display = "none";
-        document.getElementById("copy-button").style.display = "block";
+        //document.getElementById("action-copy-button").style.display = "block";
+        document.getElementById("summary-copy-button").style.display = "block";
         document.getElementById("loading-image").style.display = "none";
 
-        var copyButton = document.getElementById("copy-button");
-        copyButton.addEventListener("click", copyText(data));
+        var summaryTextField = document.getElementById('summary-text');
+        //var actionTextField = document.getElementById('action-text');
+        summaryTextField.innerHTML = data;
+        //actionTextField.innerHTML = finalActionsString;
+
+
+        var summaryCopyButton = document.getElementById("summary-copy-button");
+        //var actionCopyButton = document.getElementById("action-copy-button");
+        summaryCopyButton.addEventListener("click", summaryCopyText);
+        //actionCopyButton.addEventListener("click", actionCopyText);
+
 
     }
     if(numResponses == numChunks){
         console.log('responses lequal chunks, sending final request');
 
-        var finalPrompt = "The following are several summaries from a single sales conversation between Amplitude and a prospective customer. First, list all action items in bullet points. Then, summarize the paragraphs into 1 paragraph about what Amplitude features were discussed, 1 paragraph about the customers business needs and requirements and 1 paragraph about next steps."
+        var finalPrompt = "I'm going to provide you with a block of text that summarizes a single sales call between Amplitude and a prospect. I want you to extract the following information and return it to me in bullet points in the following sections. You can have 1 or more bullet points per section:\n" +
+        "1. 3rd party technologies the customer is already using or planning to use\n" +
+        "2. Software that competes with Amplitude the prospect is considering as an alternative\n" +
+        "3. Any timeline that was dicussed for the customer to make a deicison or start implementation\n" +
+        "4. Any busuiness requiments or needs of the prospect\n" +
+        "5. What are the most important features of Amplitude for the prospect\n" +
+        "6. What concerns or hesitations does the customer have about using Amplitude\n" +
+        "7. What are the next steps agreed upon for this sales opportunity. \n" +
+        
+        "Here is the block of text: \n";
 
-        console.log('making final call with prompt: \n ' + finalPrompt + ' and subprompt '+ finalSubPrompt + ' prompt finished');
-        makeCall(finalPrompt, finalSubPrompt);
+        console.log('making final call with prompt: \n ' + finalPrompt + ' and finalSummaryString '+ finalSummaryString + ' prompt finished');
+        makeCall(finalPrompt, finalSummaryString);
     }
 
   }
 
-  function copyText(data){
-    var responseTextField = document.getElementById('response-text');
-    var myLineBreak = data.replace(/\r\n|\r|\n/g,"</br>");
-    responseTextField.innerText = myLineBreak;
-    responseTextField.select();
-    responseTextField.setSelectionRange(0, 99999);
+  function summaryCopyText(){
+    console.log('copying summary');
+    var summaryCopyButton = document.getElementById("summary-copy-button");
+    summaryCopyButton.innerHTML = "Summary Copied!";
+    var summaryTextField = document.getElementById('summary-text');
+    summaryTextField.select();
+    summaryTextField.setSelectionRange(0, 99999);
     document.execCommand("copy");
   }
+
+  /*function actionCopyText(){
+    console.log('copying actions');
+    var actionCopyButton = document.getElementById("action-copy-button");
+    actionCopyButton.innerHTML = "Action Items Copied!";
+    var actionTextField = document.getElementById('action-text');
+    actionTextField.select();
+    actionTextField.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+  }*/

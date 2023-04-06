@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Chrome Extension</title>
+    <title>SC Meeting Summary</title>
     <style>
       body {
         font-family: sans-serif;
@@ -26,6 +26,7 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        width: 100%;
       }
       .loading {
         display: none;
@@ -36,17 +37,35 @@
         left: -9999px;
         width: 100%;
       }
+      .text-and-button {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .summary-text {
+        margin: 10px;
+      }
+      .action-text {
+        margin: 10px;
+      }
     </style>
   </head>
   <body>
     <div class="container">
+      <div class="text-and-button">
+        <textarea class="summary-text" id="summary-text" style="display:none"></textarea>
+        <button class="button" id="summary-copy-button" style="display:none">Copy Summary</button>
+      </div>
+
+      <div class="text-and-button">
+        <textarea class="action-text" id="action-text" style="display:none"></textarea>
+        <button class="button" id="action-copy-button" style="display:none">Copy Action Items</button>
+      </div>
+
       <input type="text" placeholder="Your Name" style="display:none" class="input" >
       <button class="button" id="generate-summary-button">Generate Summary</button>
-      <button class="button" id="copy-button" style="display:none">Copy Output</button>
       <img id="loading-image" style="width:220px" style="padding-top: 10px;" src="monkey-typing.gif" class="loading">
-      <textarea class="reponse-text" id="response-text" style="display:none" style="white-space:pre-wrap"></textarea>
-
     </div>
+
     <div id="loading">
         <div class="lds-ripple">
           <div></div>
